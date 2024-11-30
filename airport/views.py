@@ -2,19 +2,20 @@ from rest_framework import viewsets
 
 from airport.models import (
     Airplane,
-    AirplaneType
+    AirplaneType,
+    Airport
 )
 from airport.serializers import (
     AirplaneSerializer,
     AirplaneTypeSerializer,
     AirplaneListSerializer,
-    AirplaneDetailSerializer
+    AirplaneDetailSerializer, AirportSerializer
 )
 
 
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
-    serializer_class = AirplaneTypeSerializer
     queryset = AirplaneType.objects.all()
+    serializer_class = AirplaneTypeSerializer
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
@@ -34,3 +35,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return queryset.select_related("airplane_type")
         return queryset
+
+class AirportViewSet(viewsets.ModelViewSet):
+    queryset = Airport.objects.all()
+    serializer_class = AirportSerializer
