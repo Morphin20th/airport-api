@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from airport.models import Airplane, AirplaneType, Airport, Route
+from airport.models import Airplane, AirplaneType, Airport, Route, Crew
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
@@ -52,3 +52,9 @@ class RouteDetailSerializer(RouteSerializer):
     destination = SlugRelatedField(
         queryset=Airport.objects.all(), slug_field="name"
     )
+
+
+class CrewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Crew
+        fields = ["id", "first_name", "last_name", "full_name"]

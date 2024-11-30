@@ -42,7 +42,19 @@ class Route(models.Model):
     distance = models.IntegerField()
 
     def __str__(self):
-        return f"Route({self.source} - {self.destination})"
+        return f"{self.source} - {self.destination}"
+
+
+class Crew(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 class Flight(models.Model):
@@ -52,19 +64,12 @@ class Flight(models.Model):
     airplane = models.ForeignKey(
         Airplane, on_delete=models.CASCADE, related_name="flights"
     )
+    crewmates = models.ManyToManyField(Crew, related_name="flights")
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
 
     def __str__(self):
         return f"Flight {self.id}"
-
-
-class Crew(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
 
 
 class Order(models.Model):
