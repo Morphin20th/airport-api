@@ -33,3 +33,4 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
         if self.action == "list":
             return queryset.select_related("airplane_type")
+        return queryset

@@ -21,6 +21,7 @@ class AirplaneListSerializer(AirplaneSerializer):
 
 
 class AirplaneDetailSerializer(AirplaneSerializer):
+    airplane_type = SlugRelatedField(queryset=AirplaneType.objects.all(), slug_field="name")
     class Meta:
         model = Airplane
         fields = ["id", "name", "rows", "seats_in_row", "airplane_type"]
