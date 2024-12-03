@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "airport",
     "user",
+    "rest_framework.authtoken",
 
 ]
 
