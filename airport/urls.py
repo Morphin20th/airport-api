@@ -7,14 +7,16 @@ from airport.views import (
     AirportViewSet,
     RouteViewSet,
     CrewViewSet,
+    FlightViewSet,
 )
 
 router = routers.DefaultRouter()
-router.register("airplanes", AirplaneViewSet)
 router.register("airplane-types", AirplaneTypeViewSet)
+router.register("airplanes", AirplaneViewSet)
 router.register("airports", AirportViewSet)
 router.register("routes", RouteViewSet)
 router.register("crewmates", CrewViewSet)
+router.register("flights", FlightViewSet)
 
 urlpatterns = [
     path("", include(router.urls))

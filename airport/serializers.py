@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from airport.models import Airplane, AirplaneType, Airport, Route, Crew
+from airport.models import (
+    Airplane,
+    AirplaneType,
+    Airport,
+    Route,
+    Crew,
+    Flight
+)
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
@@ -58,3 +65,32 @@ class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crew
         fields = ["id", "first_name", "last_name", "full_name"]
+
+
+class FlightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flight
+        fields = [
+            "id", "route", "airplane", "crewmates", "departure_time", "arrival_time"
+        ]
+
+
+class FlightListSerializer(FlightSerializer):
+    airplane = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    route = serializers.StringRelatedField()
+    crewmates = serializers.SerializerMethodField()
+
+    def get_crewmates(self, obj):
+        return [crew.full_name for crew in obj.crewmates.all()]
+
+
+class FlightDetailSerializer(serializers.ModelSerializer):
+    route = RouteDetailSerializer(read_only=True)
+    airplane = AirplaneDetailSerializer(read_only=True)
+    crewmates = CrewSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Flight
+        fields = [
+            "id", "route", "airplane", "crewmates", "departure_time", "arrival_time"
+        ]
