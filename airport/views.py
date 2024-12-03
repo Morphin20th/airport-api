@@ -5,7 +5,7 @@ from airport.models import (
     AirplaneType,
     Airport,
     Route,
-    Crew, Flight
+    Crew, Flight, Order
 )
 from airport.serializers import (
     AirplaneSerializer,
@@ -16,7 +16,8 @@ from airport.serializers import (
     RouteSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
-    CrewSerializer, FlightListSerializer, FlightDetailSerializer, FlightSerializer,
+    CrewSerializer, FlightListSerializer, FlightDetailSerializer, FlightSerializer, OrderSerializer,
+    OrderListSerializer,
 )
 
 
@@ -77,7 +78,7 @@ class FlightViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return FlightListSerializer
-        if self.action in ("retrieve", ):
+        if self.action in ("retrieve",):
             return FlightDetailSerializer
         return FlightSerializer
 
@@ -87,10 +88,8 @@ class FlightViewSet(viewsets.ModelViewSet):
             return (
                 queryset
                 .select_related(
-                    "route",
                     "route__source",
                     "route__destination",
-                    "airplane",
                     "airplane__airplane_type",
                 )
                 .prefetch_related(
@@ -98,3 +97,18 @@ class FlightViewSet(viewsets.ModelViewSet):
                 )
             )
         return queryset
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrderListSerializer
+        return OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
