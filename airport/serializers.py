@@ -112,7 +112,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        # fields = ["id", "row", "seat", "flight"]
+        fields = ["id", "row", "seat", "flight"]
         ordering = ("id", "row", "seat", "flight")
 
 
