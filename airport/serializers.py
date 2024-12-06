@@ -87,18 +87,6 @@ class FlightListSerializer(FlightSerializer):
         return [crew.full_name for crew in obj.crewmates.all()]
 
 
-class FlightDetailSerializer(serializers.ModelSerializer):
-    route = RouteDetailSerializer(read_only=True)
-    airplane = AirplaneDetailSerializer(read_only=True)
-    crewmates = CrewSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = Flight
-        fields = [
-            "id", "route", "airplane", "crewmates", "departure_time", "arrival_time"
-        ]
-
-
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
@@ -118,6 +106,31 @@ class TicketSerializer(serializers.ModelSerializer):
 
 class TicketListSerializer(TicketSerializer):
     flight = FlightListSerializer(read_only=True)
+
+
+class TicketSeatsSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("row", "seat")
+
+
+class FlightDetailSerializer(serializers.ModelSerializer):
+    route = RouteDetailSerializer(read_only=True)
+    airplane = AirplaneDetailSerializer(read_only=True)
+    crewmates = CrewSerializer(read_only=True, many=True)
+    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
+
+    class Meta:
+        model = Flight
+        fields = [
+            "id",
+            "route",
+            "airplane",
+            "crewmates",
+            "departure_time",
+            "arrival_time",
+            "taken_places"
+        ]
 
 
 class OrderSerializer(serializers.ModelSerializer):
