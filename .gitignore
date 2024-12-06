@@ -4,3 +4,4 @@ venv
 .env
 **.drawio
 db.sqlite3
+media

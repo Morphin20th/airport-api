@@ -1,23 +1,34 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 
 from airport.models import (
     Airplane,
     AirplaneType,
     Airport,
     Route,
-    Crew, Flight, Order
+    Crew,
+    Flight,
+    Order
 )
 from airport.serializers import (
     AirplaneSerializer,
     AirplaneTypeSerializer,
     AirplaneListSerializer,
     AirplaneDetailSerializer,
+    AirplaneImageSerializer,
     AirportSerializer,
     RouteSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
-    CrewSerializer, FlightListSerializer, FlightDetailSerializer, FlightSerializer, OrderSerializer,
+    CrewSerializer,
+    FlightListSerializer,
+    FlightDetailSerializer,
+    FlightSerializer,
+    OrderSerializer,
     OrderListSerializer,
+
 )
 
 
@@ -36,13 +47,33 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             return AirplaneDetailSerializer
         if self.action in ("create", "update", "partial_update"):
             return AirplaneDetailSerializer
+        if self.action == "upload-image":
+            return AirplaneImageSerializer
         return AirplaneSerializer
 
     def get_queryset(self):
         queryset = self.queryset
         if self.action == "list":
             return queryset.select_related("airplane_type")
+
         return queryset
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminUser],
+    )
+    def upload_image(self, request, pk=None):
+        """Endpoint for uploading image to specific movie"""
+        airplane = self.get_object()
+        serializer = self.get_serializer(airplane, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AirportViewSet(viewsets.ModelViewSet):
