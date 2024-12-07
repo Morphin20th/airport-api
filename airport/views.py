@@ -50,7 +50,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrieve the airplanes with filters"""
         name = self.request.query_params.get("name")
-        airplane_type = self.request.query_params.get("airplane_type")
+        airplane_type = self.request.query_params.get("airplane-type")
 
         queryset = self.queryset
 
@@ -100,6 +100,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         return RouteSerializer
 
     def get_queryset(self):
+        """Retrieve the routes with filters"""
         source = self.request.query_params.get("source")
         destination = self.request.query_params.get("destination")
 
@@ -134,7 +135,20 @@ class FlightViewSet(viewsets.ModelViewSet):
         return FlightSerializer
 
     def get_queryset(self):
+        """Retrieve the flights with filters"""
+        route = self.request.query_params.get("routes")
+        airplane = self.request.query_params.get("airplanes")
+
         queryset = self.queryset
+
+        if route:
+            route_ids = _params_to_ints(route)
+            queryset = queryset.filter(route__id__in=route_ids)
+
+        if airplane:
+            airplane_ids = _params_to_ints(airplane)
+            queryset = queryset.filter(airplane__id__in=airplane_ids)
+
         if self.action in ("list", "retrieve", "update", "create", "partial_update"):
             return queryset.select_related(
                 "route__source",
