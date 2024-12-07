@@ -3,15 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from airport.models import (
-    Airplane,
-    AirplaneType,
-    Airport,
-    Route,
-    Crew,
-    Flight,
-    Order
-)
+from airport.models import Airplane, AirplaneType, Airport, Route, Crew, Flight, Order
 from airport.serializers import (
     AirplaneSerializer,
     AirplaneTypeSerializer,
@@ -28,13 +20,17 @@ from airport.serializers import (
     FlightSerializer,
     OrderSerializer,
     OrderListSerializer,
-
 )
 
 
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
+
+
+def _params_to_ints(qs):
+    """Converts a list of string IDs to a list of integers"""
+    return [int(str_id) for str_id in qs.split(",")]
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
@@ -52,7 +48,19 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         return AirplaneSerializer
 
     def get_queryset(self):
+        """Retrieve the airplanes with filters"""
+        name = self.request.query_params.get("name")
+        airplane_type = self.request.query_params.get("airplane_type")
+
         queryset = self.queryset
+
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        if airplane_type:
+            airplane_type_ids = _params_to_ints(airplane_type)
+            queryset = queryset.filter(airplane_type__id__in=airplane_type_ids)
+
         if self.action == "list":
             return queryset.select_related("airplane_type")
 
@@ -65,7 +73,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAdminUser],
     )
     def upload_image(self, request, pk=None):
-        """Endpoint for uploading image to specific movie"""
+        """Endpoint for uploading image to specific airplane"""
         airplane = self.get_object()
         serializer = self.get_serializer(airplane, data=request.data)
 
@@ -116,23 +124,21 @@ class FlightViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         if self.action in ("list", "retrieve", "update", "create", "partial_update"):
-            return (
-                queryset
-                .select_related(
-                    "route__source",
-                    "route__destination",
-                    "airplane__airplane_type",
-                )
-                .prefetch_related(
-                    "crewmates",
-                )
+            return queryset.select_related(
+                "route__source",
+                "route__destination",
+                "airplane__airplane_type",
+            ).prefetch_related(
+                "crewmates",
             )
         return queryset
 
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related(
-        "tickets__flight__airplane", "tickets__flight__route", "tickets__flight__crewmates",
+        "tickets__flight__airplane",
+        "tickets__flight__route",
+        "tickets__flight__crewmates",
     )
 
     def get_serializer_class(self):

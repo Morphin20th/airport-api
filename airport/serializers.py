@@ -133,7 +133,7 @@ class TicketSeatsSerializer(TicketSerializer):
         fields = ("row", "seat")
 
 
-class FlightDetailSerializer(serializers.ModelSerializer):
+class FlightDetailSerializer(FlightSerializer):
     route = RouteDetailSerializer(read_only=True)
     airplane = AirplaneDetailSerializer(read_only=True)
     crewmates = CrewSerializer(read_only=True, many=True)
