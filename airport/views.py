@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
@@ -62,9 +63,9 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(airplane_type__id__in=airplane_type_ids)
 
         if self.action == "list":
-            return queryset.select_related("airplane_type")
+            queryset = queryset.select_related("airplane_type")
 
-        return queryset
+        return queryset.distinct()
 
     @action(
         methods=["POST"],
@@ -115,8 +116,8 @@ class RouteViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(destination__id__in=destination_ids)
 
         if self.action in ("list", "retrieve"):
-            return queryset.select_related("source", "destination")
-        return queryset
+            queryset = queryset.select_related("source", "destination")
+        return queryset.distinct()
 
 
 class CrewViewSet(viewsets.ModelViewSet):
@@ -139,7 +140,13 @@ class FlightViewSet(viewsets.ModelViewSet):
         route = self.request.query_params.get("routes")
         airplane = self.request.query_params.get("airplanes")
 
-        queryset = self.queryset
+        queryset = self.queryset.select_related(
+            "route__source",
+            "route__destination",
+            "airplane__airplane_type",
+        ).prefetch_related(
+            "crewmates",
+        )
 
         if route:
             route_ids = _params_to_ints(route)
@@ -149,15 +156,10 @@ class FlightViewSet(viewsets.ModelViewSet):
             airplane_ids = _params_to_ints(airplane)
             queryset = queryset.filter(airplane__id__in=airplane_ids)
 
-        if self.action in ("list", "retrieve", "update", "create", "partial_update"):
-            return queryset.select_related(
-                "route__source",
-                "route__destination",
-                "airplane__airplane_type",
-            ).prefetch_related(
-                "crewmates",
-            )
-        return queryset
+        if self.action == "list":
+            queryset = queryset.annotate(occupied_seats=Count("tickets"))
+
+        return queryset.distinct()
 
 
 class OrderViewSet(viewsets.ModelViewSet):

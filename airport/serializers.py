@@ -93,7 +93,7 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = [
-            "id", "route", "airplane", "crewmates", "departure_time", "arrival_time"
+            "id", "route", "airplane", "crewmates", "departure_time", "arrival_time",
         ]
 
 
@@ -101,9 +101,27 @@ class FlightListSerializer(FlightSerializer):
     airplane = serializers.SlugRelatedField(read_only=True, slug_field="name")
     route = serializers.StringRelatedField()
     crewmates = serializers.SerializerMethodField()
+    tickets_available = serializers.SerializerMethodField()
 
     def get_crewmates(self, obj):
         return [crew.full_name for crew in obj.crewmates.all()]
+
+    def get_tickets_available(self, obj):
+        total_seats = obj.airplane.rows * obj.airplane.seats_in_row
+        occupied_seats = obj.tickets.count()
+        return total_seats - occupied_seats
+
+    class Meta:
+        model = Flight
+        fields = [
+            "id",
+            "route",
+            "airplane",
+            "crewmates",
+            "departure_time",
+            "arrival_time",
+            "tickets_available"
+        ]
 
 
 class TicketSerializer(serializers.ModelSerializer):
