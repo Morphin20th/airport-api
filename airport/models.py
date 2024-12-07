@@ -81,6 +81,24 @@ class Flight(models.Model):
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
 
+    @staticmethod
+    def validate_time(departure_time, arrival_time, error_to_raise):
+        if departure_time >= arrival_time:
+            raise error_to_raise(
+                {
+                    "departure_time": f"Departure time ({departure_time})"
+                                      f"cannot be later than the "
+                                      f"arrival date ({arrival_time})."
+                }
+            )
+
+    def clean(self):
+        Flight.validate_time(
+            self.departure_time,
+            self.arrival_time,
+            ValidationError
+        )
+
     def __str__(self):
         return f"Flight {self.id}"
 

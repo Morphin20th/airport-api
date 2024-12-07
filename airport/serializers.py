@@ -78,6 +78,18 @@ class CrewSerializer(serializers.ModelSerializer):
 
 
 class FlightSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        data = super(FlightSerializer, self).validate(attrs=attrs)
+        Flight.validate_time(
+            attrs["departure_time"],
+            attrs["arrival_time"],
+            ValidationError
+        )
+        return data
+
+    departure_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
     class Meta:
         model = Flight
         fields = [
