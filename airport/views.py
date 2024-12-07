@@ -100,7 +100,19 @@ class RouteViewSet(viewsets.ModelViewSet):
         return RouteSerializer
 
     def get_queryset(self):
+        source = self.request.query_params.get("source")
+        destination = self.request.query_params.get("destination")
+
         queryset = self.queryset
+
+        if source:
+            source_ids = _params_to_ints(source)
+            queryset = queryset.filter(source__id__in=source_ids)
+
+        if destination:
+            destination_ids = _params_to_ints(destination)
+            queryset = queryset.filter(destination__id__in=destination_ids)
+
         if self.action in ("list", "retrieve"):
             return queryset.select_related("source", "destination")
         return queryset
