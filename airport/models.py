@@ -31,7 +31,7 @@ class Airplane(models.Model):
     image = models.ImageField(null=True, upload_to=airplane_image_file_path)
 
     def __str__(self):
-        return f"Airplane: {self.name}"
+        return self.name
 
     class Meta:
         ordering = ["name"]
@@ -98,6 +98,9 @@ class Flight(models.Model):
             self.arrival_time,
             ValidationError
         )
+
+    class Meta:
+        unique_together = ("route", "airplane", "departure_time")
 
     def __str__(self):
         return f"Flight {self.id}"

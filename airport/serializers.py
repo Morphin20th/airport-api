@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueTogetherValidator
 
 from airport.models import (
     Airplane,
@@ -95,6 +96,13 @@ class FlightSerializer(serializers.ModelSerializer):
         fields = [
             "id", "route", "airplane", "crewmates", "departure_time", "arrival_time",
         ]
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Flight.objects.all(),
+                fields=["route", "airplane", "departure_time"],
+                message="A flight with this route, airplane, and departure time already exists.",
+            )
+        ]
 
 
 class FlightListSerializer(FlightSerializer):
@@ -139,6 +147,13 @@ class TicketSerializer(serializers.ModelSerializer):
         model = Ticket
         fields = ["id", "row", "seat", "flight"]
         ordering = ("id", "row", "seat", "flight")
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Ticket.objects.all(),
+                fields=["row", "seat", "flight"],
+                message="A ticket with this seat and row already exists for the given flight."
+            )
+        ]
 
 
 class TicketListSerializer(TicketSerializer):
