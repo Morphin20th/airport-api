@@ -1,13 +1,25 @@
 from datetime import datetime
 
 from django.db.models import Count
-from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter
+)
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from airport.models import Airplane, AirplaneType, Airport, Route, Crew, Flight, Order
+from airport.models import (
+    Airplane,
+    AirplaneType,
+    Airport,
+    Route,
+    Crew,
+    Flight,
+    Order
+)
 from airport.serializers import (
     AirplaneSerializer,
     AirplaneTypeSerializer,
@@ -48,7 +60,8 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 name="airplane-type",
                 type={"type": "array", "items": {"type": "number"}},
-                description="Filter by airplane type IDs (e.g., ?airplane-type=1,3)",
+                description="Filter by airplane type IDs "
+                            "(e.g., ?airplane-type=1,3)",
             ),
         ]
     )
@@ -120,7 +133,8 @@ class AirportViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 name="destination",
                 type={"type": "array", "items": {"type": "number"}},
-                description="Filter by destination IDs (e.g., ?destination=1,3)",
+                description="Filter by destination IDs "
+                            "(e.g., ?destination=1,3)",
             ),
         ]
     )
@@ -177,7 +191,8 @@ class CrewViewSet(viewsets.ModelViewSet):
                 name="departure-date",
                 type=str,
                 description="Filter by departure date in "
-                            "YYYY-MM-DD format (e.g., ?departure-date=2024-10-08)",
+                            "YYYY-MM-DD format "
+                            "(e.g., ?departure-date=2024-10-08)",
             )
         ]
     )

@@ -33,11 +33,15 @@ class AirplaneListSerializer(AirplaneSerializer):
 
 
 class AirplaneDetailSerializer(AirplaneSerializer):
-    airplane_type = SlugRelatedField(queryset=AirplaneType.objects.all(), slug_field="name")
+    airplane_type = SlugRelatedField(
+        queryset=AirplaneType.objects.all(), slug_field="name"
+    )
 
     class Meta:
         model = Airplane
-        fields = ["id", "name", "rows", "seats_in_row", "airplane_type", "image"]
+        fields = [
+            "id", "name", "rows", "seats_in_row", "airplane_type", "image"
+        ]
 
 
 class AirplaneImageSerializer(serializers.ModelSerializer):
@@ -94,13 +98,19 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = [
-            "id", "route", "airplane", "crewmates", "departure_time", "arrival_time",
+            "id",
+            "route",
+            "airplane",
+            "crewmates",
+            "departure_time",
+            "arrival_time",
         ]
         validators = [
             UniqueTogetherValidator(
                 queryset=Flight.objects.all(),
                 fields=["route", "airplane", "departure_time"],
-                message="A flight with this route, airplane, and departure time already exists.",
+                message="A flight with this route, "
+                        "airplane, and departure time already exists.",
             )
         ]
 
@@ -151,7 +161,8 @@ class TicketSerializer(serializers.ModelSerializer):
             UniqueTogetherValidator(
                 queryset=Ticket.objects.all(),
                 fields=["row", "seat", "flight"],
-                message="A ticket with this seat and row already exists for the given flight."
+                message="A ticket with this seat and row "
+                        "already exists for the given flight."
             )
         ]
 
@@ -170,7 +181,9 @@ class FlightDetailSerializer(FlightSerializer):
     route = RouteDetailSerializer(read_only=True)
     airplane = AirplaneDetailSerializer(read_only=True)
     crewmates = CrewSerializer(read_only=True, many=True)
-    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
+    taken_places = TicketSeatsSerializer(
+        source="tickets", many=True, read_only=True
+    )
 
     class Meta:
         model = Flight
