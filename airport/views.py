@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.db.models import Count
+from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
@@ -24,16 +27,32 @@ from airport.serializers import (
 )
 
 
-class AirplaneTypeViewSet(viewsets.ModelViewSet):
-    queryset = AirplaneType.objects.all()
-    serializer_class = AirplaneTypeSerializer
-
-
 def _params_to_ints(qs):
     """Converts a list of string IDs to a list of integers"""
     return [int(str_id) for str_id in qs.split(",")]
 
 
+class AirplaneTypeViewSet(viewsets.ModelViewSet):
+    queryset = AirplaneType.objects.all()
+    serializer_class = AirplaneTypeSerializer
+
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="name",
+                type=str,
+                description="Filter by name (e.g., ?name=Boeing)",
+            ),
+            OpenApiParameter(
+                name="airplane-type",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by airplane type IDs (e.g., ?airplane-type=1,3)",
+            ),
+        ]
+    )
+)
 class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.all()
 
@@ -90,6 +109,22 @@ class AirportViewSet(viewsets.ModelViewSet):
     serializer_class = AirportSerializer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="source",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by source IDs (e.g., ?source=1,3)",
+            ),
+            OpenApiParameter(
+                name="destination",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by destination IDs (e.g., ?destination=1,3)",
+            ),
+        ]
+    )
+)
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
 
@@ -125,6 +160,28 @@ class CrewViewSet(viewsets.ModelViewSet):
     serializer_class = CrewSerializer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="routes",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by route IDs (e.g., ?routes=1,3)",
+            ),
+            OpenApiParameter(
+                name="airplanes",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by airplane IDs (e.g., ?airplanes=1,3)",
+            ),
+            OpenApiParameter(
+                name="departure-date",
+                type=str,
+                description="Filter by departure date in "
+                            "YYYY-MM-DD format (e.g., ?departure-date=2024-10-08)",
+            )
+        ]
+    )
+)
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
 
@@ -139,6 +196,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         """Retrieve the flights with filters"""
         route = self.request.query_params.get("routes")
         airplane = self.request.query_params.get("airplanes")
+        departure_date = self.request.query_params.get("departure-date")
 
         queryset = self.queryset.select_related(
             "route__source",
@@ -155,6 +213,10 @@ class FlightViewSet(viewsets.ModelViewSet):
         if airplane:
             airplane_ids = _params_to_ints(airplane)
             queryset = queryset.filter(airplane__id__in=airplane_ids)
+
+        if departure_date:
+            date = datetime.strptime(departure_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(departure_time__date=date)
 
         if self.action == "list":
             queryset = queryset.annotate(occupied_seats=Count("tickets"))

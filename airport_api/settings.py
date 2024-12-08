@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "airport",
     "user",
     "rest_framework.authtoken",
-
+    "drf_spectacular",
 ]
 
 AUTH_USER_MODEL = "user.User"
@@ -147,4 +147,5 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "airport_api.pagination.Pagination",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
