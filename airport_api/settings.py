@@ -140,6 +140,9 @@ INTERNAL_IPS = [
 ]
 
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "airport_api.permissions.IsAdminOrIsAuthenticatedReadOnly"
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ]
