@@ -6,7 +6,7 @@ from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter
 )
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -44,7 +44,11 @@ def _params_to_ints(qs):
     return [int(str_id) for str_id in qs.split(",")]
 
 
-class AirplaneTypeViewSet(viewsets.ModelViewSet):
+class AirplaneTypeViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin
+):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
 
@@ -66,15 +70,18 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
         ]
     )
 )
-class AirplaneViewSet(viewsets.ModelViewSet):
+class AirplaneViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+):
     queryset = Airplane.objects.all()
 
     def get_serializer_class(self):
         if self.action == "list":
             return AirplaneListSerializer
-        if self.action == "retrieve":
-            return AirplaneDetailSerializer
-        if self.action in ("create", "update", "partial_update"):
+        if self.action in ("create", "retrieve"):
             return AirplaneDetailSerializer
         if self.action == "upload-image":
             return AirplaneImageSerializer
@@ -94,7 +101,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             airplane_type_ids = _params_to_ints(airplane_type)
             queryset = queryset.filter(airplane_type__id__in=airplane_type_ids)
 
-        if self.action == "list":
+        if self.action in ("retrieve", "create", "list"):
             queryset = queryset.select_related("airplane_type")
 
         return queryset.distinct()
@@ -117,7 +124,11 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AirportViewSet(viewsets.ModelViewSet):
+class AirportViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
 
@@ -139,13 +150,18 @@ class AirportViewSet(viewsets.ModelViewSet):
         ]
     )
 )
-class RouteViewSet(viewsets.ModelViewSet):
+class RouteViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+):
     queryset = Route.objects.all()
 
     def get_serializer_class(self):
         if self.action == "list":
             return RouteListSerializer
-        if self.action in ("retrieve", "update", "partial_update"):
+        if self.action in ("retrieve",):
             return RouteDetailSerializer
         return RouteSerializer
 
@@ -169,7 +185,11 @@ class RouteViewSet(viewsets.ModelViewSet):
         return queryset.distinct()
 
 
-class CrewViewSet(viewsets.ModelViewSet):
+class CrewViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
 
@@ -239,7 +259,11 @@ class FlightViewSet(viewsets.ModelViewSet):
         return queryset.distinct()
 
 
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
     queryset = Order.objects.prefetch_related(
         "tickets__flight__airplane",
         "tickets__flight__route",
