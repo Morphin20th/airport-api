@@ -1,9 +1,4 @@
-import io
-import os
-
-from PIL import Image
 from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
