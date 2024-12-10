@@ -22,11 +22,14 @@ def airplane_image_file_path(instance, filename):
 
 
 class Airplane(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255,)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
     airplane_type = models.ForeignKey(
-        AirplaneType, on_delete=models.CASCADE, related_name="airplanes"
+        AirplaneType,
+        on_delete=models.CASCADE,
+        related_name="airplanes",
+        null=True
     )
     image = models.ImageField(null=True, upload_to=airplane_image_file_path)
 
@@ -77,7 +80,7 @@ class Flight(models.Model):
     airplane = models.ForeignKey(
         Airplane, on_delete=models.CASCADE, related_name="flights"
     )
-    crewmates = models.ManyToManyField(Crew, related_name="flights")
+    crewmates = models.ManyToManyField(Crew, related_name="flights", blank=True)
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
 
