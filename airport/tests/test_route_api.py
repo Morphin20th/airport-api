@@ -113,3 +113,43 @@ class AuthenticatedRouteApiTests(TestCase):
         }
         res = self.client.post(ROUTE_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class AdminRouteApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="admin@admin.admin", password="Test1234!", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.source_1 = sample_source()
+        cls.source_2 = sample_source(name="test_source", closest_big_city="Test")
+        cls.destination_1 = sample_destination()
+        cls.destination_2 = sample_destination(name="test_destination", closest_big_city="Test")
+        cls.route_1 = sample_route(source=cls.source_1, destination=cls.destination_1)
+        cls.route_2 = sample_route(source=cls.source_2, destination=cls.destination_2)
+
+    def test_create_route(self):
+        payload = {
+            "source": self.source_1.id,
+            "destination": self.destination_1.id,
+            "distance": 30,
+        }
+        res = self.client.post(ROUTE_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_delete_route_not_allowed(self):
+        url = detail_url(self.route_1.id)
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_update_route_not_allowed(self):
+        payload = {"source": self.source_2.id, "destination": self.destination_2.id, "distance": 30}
+        res = self.client.patch(f"{ROUTE_URL}{self.route_1.id}/", payload)
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertNotEqual(self.route_1.source, payload["source"])
+        self.assertNotEqual(self.route_1.destination, payload["destination"])
+        self.assertNotEqual(self.route_1.distance, payload["distance"])
