@@ -1,5 +1,9 @@
+import os
+import tempfile
+
+from PIL import Image
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -152,3 +156,50 @@ class AdminAirplaneTests(TestCase):
         res = self.client.patch(f"{AIRPLANE_URL}{airplane.id}/", payload)
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertNotEqual(airplane.name, payload["name"])
+
+
+class AirplaneImageUploadTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin_user = get_user_model().objects.create_user(
+            email="admin@admin.admin", password="Test1234!", is_staff=True
+        )
+        self.regular_user = get_user_model().objects.create_user(
+            email="user@user.user", password="Test1234!", is_staff=False
+        )
+        self.airplane = sample_airplane(name="Boeing 747", airplane_type=sample_airplane_type())
+        self.url = image_upload_url(self.airplane.id)
+
+    def tearDown(self):
+        self.airplane.image.delete()
+
+    def test_upload_image_successful(self):
+        self.client.force_authenticate(self.admin_user)
+
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as temp_image:
+            img = Image.new("RGB", (10, 10), color=(255, 0, 0))
+            img.save(temp_image, format="JPEG")
+            temp_image.seek(0)
+
+            payload = {
+                "image": temp_image,
+                "name": self.airplane.name
+            }
+            res = self.client.post(self.url, payload, format="multipart")
+
+        self.airplane.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("image", res.data)
+        self.assertTrue(os.path.exists(self.airplane.image.path))
+
+    def test_upload_image_by_regular_user(self):
+        self.client.force_authenticate(self.regular_user)
+
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as temp_image:
+            img = Image.new("RGB", (10, 10), color=(255, 0, 0))
+            img.save(temp_image, format="JPEG")
+            temp_image.seek(0)
+
+            res = self.client.post(self.url, {"image": temp_image}, format="multipart")
+
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
