@@ -18,6 +18,7 @@ packaging==24.2
 pathspec==0.12.1
 pillow==11.0.0
 platformdirs==4.3.6
+psycopg==3.2.3
 pycodestyle==2.12.1
 pyflakes==3.2.0
 PyJWT==2.10.1
