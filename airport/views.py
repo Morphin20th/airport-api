@@ -8,7 +8,7 @@ from drf_spectacular.utils import (
 )
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from airport.models import (
@@ -264,6 +264,7 @@ class OrderViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
 ):
+    permission_classes = [IsAuthenticated]
     queryset = Order.objects.prefetch_related(
         "tickets__flight__airplane",
         "tickets__flight__route",
