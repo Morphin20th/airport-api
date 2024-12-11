@@ -1,0 +1,256 @@
+[
+{
+    "model": "airport.airplanetype",
+    "pk": 2,
+    "fields": {
+        "name": "Boeing 737"
+    }
+},
+{
+    "model": "airport.airplanetype",
+    "pk": 3,
+    "fields": {
+        "name": "Airbus A320"
+    }
+},
+{
+    "model": "airport.airplane",
+    "pk": 4,
+    "fields": {
+        "name": "Boeing 737 Max",
+        "rows": 20,
+        "seats_in_row": 6,
+        "airplane_type": 2,
+        "image": null
+    }
+},
+{
+    "model": "airport.airplane",
+    "pk": 5,
+    "fields": {
+        "name": "Boeing 737 NG",
+        "rows": 18,
+        "seats_in_row": 6,
+        "airplane_type": 2,
+        "image": null
+    }
+},
+{
+    "model": "airport.airplane",
+    "pk": 6,
+    "fields": {
+        "name": "Airbus A320 Neo",
+        "rows": 25,
+        "seats_in_row": 6,
+        "airplane_type": 3,
+        "image": null
+    }
+},
+{
+    "model": "airport.airplane",
+    "pk": 7,
+    "fields": {
+        "name": "Airbus A321",
+        "rows": 30,
+        "seats_in_row": 6,
+        "airplane_type": 3,
+        "image": null
+    }
+},
+{
+    "model": "airport.airport",
+    "pk": 3,
+    "fields": {
+        "name": "JFK International Airport",
+        "closest_big_city": "New York"
+    }
+},
+{
+    "model": "airport.airport",
+    "pk": 4,
+    "fields": {
+        "name": "Los Angeles International Airport",
+        "closest_big_city": "Los Angeles"
+    }
+},
+{
+    "model": "airport.airport",
+    "pk": 5,
+    "fields": {
+        "name": "O'Hare International Airport",
+        "closest_big_city": "Chicago"
+    }
+},
+{
+    "model": "airport.airport",
+    "pk": 6,
+    "fields": {
+        "name": "Miami International Airport",
+        "closest_big_city": "Miami"
+    }
+},
+{
+    "model": "airport.route",
+    "pk": 3,
+    "fields": {
+        "source": 3,
+        "destination": 4,
+        "distance": 4500
+    }
+},
+{
+    "model": "airport.route",
+    "pk": 4,
+    "fields": {
+        "source": 4,
+        "destination": 5,
+        "distance": 2800
+    }
+},
+{
+    "model": "airport.route",
+    "pk": 5,
+    "fields": {
+        "source": 5,
+        "destination": 6,
+        "distance": 1900
+    }
+},
+{
+    "model": "airport.route",
+    "pk": 6,
+    "fields": {
+        "source": 6,
+        "destination": 3,
+        "distance": 2100
+    }
+},
+{
+    "model": "airport.crew",
+    "pk": 1,
+    "fields": {
+        "first_name": "John",
+        "last_name": "Doe"
+    }
+},
+{
+    "model": "airport.crew",
+    "pk": 2,
+    "fields": {
+        "first_name": "Jane",
+        "last_name": "Brown"
+    }
+},
+{
+    "model": "airport.crew",
+    "pk": 3,
+    "fields": {
+        "first_name": "Alice",
+        "last_name": "Johnson"
+    }
+},
+{
+    "model": "airport.crew",
+    "pk": 4,
+    "fields": {
+        "first_name": "Bob",
+        "last_name": "Brown"
+    }
+},
+{
+    "model": "airport.crew",
+    "pk": 5,
+    "fields": {
+        "first_name": "Emma",
+        "last_name": "Wilson"
+    }
+},
+{
+    "model": "airport.crew",
+    "pk": 6,
+    "fields": {
+        "first_name": "John",
+        "last_name": "Smith"
+    }
+},
+{
+    "model": "airport.flight",
+    "pk": 3,
+    "fields": {
+        "route": 3,
+        "airplane": 4,
+        "departure_time": "2024-11-12T08:00:00Z",
+        "arrival_time": "2024-11-12T12:00:00Z",
+        "crewmates": [
+            4,
+            5,
+            6
+        ]
+    }
+},
+{
+    "model": "airport.flight",
+    "pk": 4,
+    "fields": {
+        "route": 4,
+        "airplane": 6,
+        "departure_time": "2024-11-12T13:00:00Z",
+        "arrival_time": "2024-11-12T16:30:00Z",
+        "crewmates": [
+            3,
+            4,
+            6
+        ]
+    }
+},
+{
+    "model": "airport.flight",
+    "pk": 5,
+    "fields": {
+        "route": 5,
+        "airplane": 7,
+        "departure_time": "2024-11-13T09:00:00Z",
+        "arrival_time": "2024-11-13T12:00:00Z",
+        "crewmates": [
+            3,
+            6
+        ]
+    }
+},
+{
+    "model": "airport.flight",
+    "pk": 6,
+    "fields": {
+        "route": 6,
+        "airplane": 5,
+        "departure_time": "2024-11-13T14:00:00Z",
+        "arrival_time": "2024-11-13T17:30:00Z",
+        "crewmates": []
+    }
+},
+{
+    "model": "airport.order",
+    "pk": 1,
+    "fields": {
+        "created_at": "2024-12-11T12:09:44.821Z",
+        "user": 1
+    }
+},
+{
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$5Rz4jPMnP1bhtMwMGQDBVV$NlmBco2Iu0Idp8bafdCBrSoJqnkT61Xt7gnyIJpM/uw=",
+        "last_login": "2024-12-11T12:35:42.020Z",
+        "is_superuser": true,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2024-12-11T10:03:19.557Z",
+        "email": "admin@admin.admin",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]
