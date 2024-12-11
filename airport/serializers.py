@@ -25,11 +25,15 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
 class AirplaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airplane
-        fields = ["id", "name", "airplane_type", "image"]
+        fields = ["id", "image"]
 
 
 class AirplaneListSerializer(AirplaneSerializer):
     airplane_type = SlugRelatedField(read_only=True, slug_field="name")
+
+    class Meta:
+        model = Airplane
+        fields = ["id", "name", "airplane_type", "image"]
 
 
 class AirplaneDetailSerializer(AirplaneSerializer):
