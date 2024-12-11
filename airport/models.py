@@ -22,7 +22,7 @@ def airplane_image_file_path(instance, filename):
 
 
 class Airplane(models.Model):
-    name = models.CharField(max_length=255,)
+    name = models.CharField(max_length=255, )
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
     airplane_type = models.ForeignKey(

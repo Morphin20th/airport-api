@@ -70,4 +70,3 @@ docker-compose exec airport python manage.py loaddata initial_data.json
 - **Filter routes by source and destination**
 - **Filter flights by routes, airplanes, departure dates**
 - **Upload images to airplanes**: api/airplanes/id/upload-image/
-

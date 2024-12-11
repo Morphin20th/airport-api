@@ -23,4 +23,3 @@ RUN chmod -R 755 /files/media
 
 
 USER regular_user
-
