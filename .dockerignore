@@ -1,8 +1,9 @@
 .venv
-venv
 .idea
 **__pycache__
 .env
 **.drawio
 db.sqlite3
 media
+Dockerfile
+docker-compose.yaml
