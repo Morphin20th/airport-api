@@ -115,7 +115,9 @@ class AirplaneViewSet(
     def upload_image(self, request, pk=None):
         """Endpoint for uploading image to specific airplane"""
         airplane = self.get_object()
-        serializer = self.get_serializer(airplane, data=request.data, partial=True)
+        serializer = self.get_serializer(
+            airplane, data=request.data, partial=True
+        )
 
         if serializer.is_valid():
             serializer.save()
